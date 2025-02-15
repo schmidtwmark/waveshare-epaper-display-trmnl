@@ -39,14 +39,20 @@ class BaseWeatherProvider(ABC):
         """
 
         # adjust icon for sunrise and sunset
-        dt = datetime.datetime.now(pytz.utc)
+        dt = datetime.datetime.now()
         city = LocationInfo(location_lat, location_long)
         s = sun(city.observer, date=dt)
         verdict = False
-        if dt > s['sunset'] or dt < s['sunrise']:
-            verdict = False
-        else:
+        # there's some timezone shenanigans happening. astral returns sunrise in local time, but thinks it is UTC. We just need to compare hour and minutes 
+        current_hour = dt.hour
+        sunrise_hour = s['sunrise'].hour
+        sunset_hour = s['sunset'].hour
+        logging.debug(f"sunrise: {sunrise_hour}, current_hour: {current_hour}, sunset_hour: {sunset_hour}")
+
+        if sunrise_hour < current_hour < sunset_hour:
             verdict = True
+        else:
+            verdict = False
 
         logging.debug(
             "is_daytime({}, {}) - {}"

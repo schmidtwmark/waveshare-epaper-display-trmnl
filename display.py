@@ -48,8 +48,10 @@ try:
 
 except IOError as e:
     logging.exception(e)
+    epd.sleep()
 
 except KeyboardInterrupt:
     logging.debug("Keyboard Interrupt - Exit")
+    epd.sleep()
     epd7in5.epdconfig.module_exit()
     exit()
